@@ -19,3 +19,7 @@ struct CPU {
 	int output_register;
 	int input_register;
 };
+
+struct Word {
+	int contents : 16;
+};

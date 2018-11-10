@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "structs.c"
+#include "auxiliary_f.c"
 
 
 /*
@@ -33,10 +34,8 @@ struct Word* getMainMemory(); //Access as a pointer so we can use it as a massiv
 
 
 int main() {
-
-	
-
-
+	clear_mem(getMainMemory(0));
+	display_mem();
 	return 0;
 }
 
@@ -50,6 +49,9 @@ int getNthBit(int input, int desired_bit) {
 	return (input >> desired_bit) & 1;
 }
 
-struct Word* getMainMemory() {
-	return &main_memory;
+/*
+* Returns a pointer to the specified memory location
+*/
+struct Word* getMainMemory(int location) {
+	return &main_memory[location];
 }
