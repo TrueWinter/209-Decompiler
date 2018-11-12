@@ -2,14 +2,10 @@
 #include "structs.c"
 #include "auxiliary_f.c"
 
-
 /*
+* Summary
 * A disassembler is a computer program that translates machine language into assembly language.
 */
-
-
-
-
 
 
 /*
@@ -19,7 +15,6 @@
 //Declare main CPU. Check 'structs.c' for details.
 struct CPU cpu;
 struct Word main_memory[4096]; 
-
 
 
 
@@ -42,16 +37,13 @@ int main() {
 
 
 /*
-* Functions
+* Functions/Methods
 */
 
 int getNthBit(int input, int desired_bit) {
 	return (input >> desired_bit) & 1;
 }
 
-/*
-* Returns a pointer to the specified memory location
-*/
 struct Word* getMainMemory(int location) {
 	return &main_memory[location];
 }
@@ -96,6 +88,9 @@ void opCodeFunctions (struct Instruction exInstruct, struct CPU comp, int x) {
 			break;
 			
 			case -1: comp.pc = comp.mbr;
+			default:
+				printf("This instruction does not exist: Opcode: %d, Operand: %s",exInstruct.opcode, exInstruct.operand);
+				break;
 			
 			
 		}
