@@ -66,7 +66,7 @@ void display_mem(){
 	char bin[16];
 	dtob(16, &bin);
 
-	for (i=0;i<=mem_size/16;i++){
+	for (i=0;i<=mem_size;i++){
 
 		char bufferWord[16];
 		dtob(getMainMemory(i)->contents, &bufferWord);
