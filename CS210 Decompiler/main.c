@@ -89,7 +89,7 @@ void opCodeFunctions (struct Instruction exInstruct, struct CPU comp, int x) {
 			
 			case -1: comp.pc = comp.mbr;
 			default:
-				printf("This instruction does not exist: Opcode: %d, Operand: %s",exInstruct.opcode, exInstruct.operand);
+				printf("This instruction does not exist: Opcode: %d, Operand: %d",exInstruct.opcode, exInstruct.operand);
 				break;
 			
 			
