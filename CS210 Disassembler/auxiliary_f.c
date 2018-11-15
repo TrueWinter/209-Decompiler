@@ -161,5 +161,11 @@ void print_instruction(struct Instruction instruct){
 		printf("Skipcond\n");
 	} else if (instruct.opcode == 8){
 		printf("Jump %d\n", instruct.operand);
+	} else if (instruct.opcode == 9){
+		printf("Multiply %d\n", instruct.operand);
+	} else if (instruct.opcode == 10) {
+		printf("Shift Left %d\n", instruct.operand);
+	} else if (instruct.operand == 11) {
+		printf("Shift Right %d\n", instruct.operand);
 	}
 }
