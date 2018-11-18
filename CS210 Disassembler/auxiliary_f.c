@@ -8,7 +8,9 @@ int getNthBit(int input, int desired_bit);
 
 void clear_mem(struct Word *);
 int btod(char *);
+int twoCtoD(char *);
 void dtob(int num, char *str);
+void dtotwoc(int, char *);
 void display_mem();
 void load_file(char *);
 void user_code();
@@ -40,12 +42,31 @@ int btod(char *binP){
 		if(binP[i] == '1'){
 			dec += pow(2, counter);
 		} else if ((binP[i] != '0') && (strcmp(binP, "stop")!=0)){
-			printf("Error: not a binary number\n");
-			return -1;
+			printf("Error: not a binary number: %c\n", binP[i]);
+			return 32,768; //returns a value greater than the 16 bit max, to be used to handle errors
 		}
     counter++;
 	}
 	return dec;
+}
+
+/* 
+* Converts a two's complement binary string into a decimal value
+*/
+int twoCtoD(char *str) {
+	if (str[0] == '0') {
+		return btod(str);
+	} else {
+		char magn[16] = "";
+		for (int i=1;i<=15;i++) {
+			if (str[i] == '1') {
+				strcat(magn, "0");
+			} else {
+				strcat(magn, "1");
+			}
+		}
+		return -(btod(magn) + 1);
+	}
 }
 
 /*
@@ -64,12 +85,12 @@ void display_mem(){
 	int i;
 
 	char bin[16];
-	dtob(16, &bin);
+	dtob(16, bin);
 
 	for (i=0;i<=mem_size;i++){
 
 		char bufferWord[16];
-		dtob(getMainMemory(i)->contents, &bufferWord);
+		dtob(getMainMemory(i)->contents, bufferWord);
 
 		printf("Word: %d\t  Value:  %s\n", i, bufferWord); 
 	}
