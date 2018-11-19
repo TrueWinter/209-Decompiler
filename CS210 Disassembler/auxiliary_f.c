@@ -12,10 +12,11 @@ int twoCtoD(char *);
 void dtob(int num, char *str);
 void dtotwoc(int, char *);
 void display_mem();
-void load_file(char *);
+int load_file(char *);
 void user_code();
 void print_assembly();
 void print_instruction(struct Instruction);
+struct Instruction decodeInstruction(int);
 
 
 void getBin(int num, char *str);
@@ -31,6 +32,10 @@ void clear_mem(struct Word *main_memory){
 	memset (main_memory, 0, mem_size);
 }
 
+void load_default(){
+	char filename[20] = "default.txt";
+	load_file(filename);
+}
 /* 
 * Converts a binary string into a decimal value
 */
@@ -43,7 +48,7 @@ int btod(char *binP){
 			dec += pow(2, counter);
 		} else if ((binP[i] != '0') && (strcmp(binP, "stop")!=0)){
 			printf("Error: not a binary number: %c\n", binP[i]);
-			return 32,768; //returns a value greater than the 16 bit max, to be used to handle errors
+			return 32768; //returns a value greater than the 16 bit max, to be used to handle errors
 		}
     counter++;
 	}
@@ -65,7 +70,8 @@ int twoCtoD(char *str) {
 				strcat(magn, "1");
 			}
 		}
-		return -(btod(magn) + 1);
+		if (btod(magn) != 32768) return -(btod(magn) + 1);
+		else return 32768;
 	}
 }
 
@@ -92,7 +98,10 @@ void display_mem(){
 		char bufferWord[16];
 		dtob(getMainMemory(i)->contents, bufferWord);
 
-		printf("Word: %d\t  Value:  %s\n", i, bufferWord); 
+		if ((getMainMemory(i)->contents) != 0){ //just prints the addresses with data or instructions other than halt in them
+			printf("Word: %d    \tValue:  %s\n", i, bufferWord); 
+		}
+
 	}
 }
 
@@ -103,61 +112,48 @@ void user_code(){
 	while (strcmp(exit_string, input)!=0){
 		printf("Please enter the next 16 bit instruction in binary\nEnter 'stop' to stop input: ");
 		scanf("%s", input);
-		while(((btod(input) == -1) || (strlen(input) > 16)) && (strcmp(exit_string, input)!=0)){
+		while(((twoCtoD(input) == 32768) || (strlen(input) > 16)) && (strcmp(exit_string, input)!=0)){
 			printf("Enter it again: ");
 			scanf("%s", input);
 		}
 		if (strcmp(exit_string, input)!=0){
-			getMainMemory(i)->contents = btod(input);
+			getMainMemory(i)->contents = twoCtoD(input);
 		}
 		i++;
 	}
 }
 
-void load_file(char *file_name){
+int load_file(char *file_name){
 	FILE *fp;
 	fp = fopen(file_name, "r");
 	if(fp == NULL) {
 		perror("Error opening file");
-		return;
+		return -1;
 	}
-	char temp[16];
+	char temp[18];
+	char bin[17];
 	int i = 0;
-	while (fgets(temp, 17, fp)!=NULL){
-		getMainMemory(i)->contents = btod(temp);
+	while (fgets(temp, 18, fp)!=NULL){
+		//puts(temp);
+		strncpy(bin, temp, 16);
+		bin[16] = '\0';
+		//puts(bin);
+		//printf("%d\n", twoCtoD(bin));
+		getMainMemory(i)->contents = twoCtoD(bin);
 		i++;
 	}
 	
-	
 	fclose(fp);
+	return 0;
 }
 
 void print_assembly(){
 	struct Instruction instruct;
-	char opCode_s[4];
-	char operand_s[12];
 	instruct.opcode = -1;
 	int i;
 	int counter = 0;
 	while (instruct.opcode != 0){
-		strcpy(opCode_s, "");
-		strcpy(operand_s, "");
-		for (i=15;i>=12;i--){
-			if (getNthBit(getMainMemory(counter)->contents, i) == 1){
-				strcat(opCode_s, "1");
-			} else{
-				strcat(opCode_s, "0");
-			}
-		}
-		instruct.opcode = btod(opCode_s);
-		for (i=11;i>=0;i--){
-			if (getNthBit(getMainMemory(counter)->contents, i) == 1){
-				strcat(operand_s, "1");
-			} else{
-				strcat(operand_s, "0");
-			}
-		}
-		instruct.operand = btod(operand_s);
+		instruct = decodeInstruction(getMainMemory(counter)->contents);
 		print_instruction(instruct);
 		counter++;
 	}
@@ -189,4 +185,28 @@ void print_instruction(struct Instruction instruct){
 	} else if (instruct.operand == 11) {
 		printf("Shift Right %d\n", instruct.operand);
 	}
+}
+
+struct Instruction decodeInstruction(int num){
+	//printf("%d", num);
+	struct Instruction instruct;
+	char opCode_s[5]="";
+	char operand_s[13]="";
+	for (int i=15;i>=12;i--){
+			if (getNthBit(num, i) == 1){
+				strcat(opCode_s, "1");
+			} else{
+				strcat(opCode_s, "0");
+			}
+		}
+		instruct.opcode = twoCtoD(opCode_s);
+		for (int i=11;i>=0;i--){
+			if (getNthBit(num, i) == 1){
+				strcat(operand_s, "1");
+			} else{
+				strcat(operand_s, "0");
+			}
+		}
+		instruct.operand = twoCtoD(operand_s);
+		return instruct;
 }

@@ -10,9 +10,9 @@ struct Instruction {
 };
 
 struct CPU {
-	int ac;
-	int ir;
-	int mbr;
+	int ac: 16;
+	int ir: 16;
+	int mbr: 16;
 	int pc : 12;
 	int mar : 12;
 

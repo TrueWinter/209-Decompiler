@@ -25,11 +25,16 @@ struct Word main_memory[4096];
 // Returns n'th bit from the input given to it
 int getNthBit(int input, int desired_bit); 
 struct Word* getMainMemory(); //Access as a pointer so we can use it as a massive long 'word' 
-void opCodeFunctions(struct Instruction exInstruct, struct CPU comp, int x); // x will be the decimal version of the instruction, passed in to be added to MAR
+int opCodeFunctions(struct Instruction exInstruct); // x will be the decimal version of the instruction, passed in to be added to MAR
+int fetchExecute();
 
-
-int main() {
+int main(int argc, char *argv[]) {
 	clear_mem(getMainMemory(0));
+	if (strcmp(argv[argc-1], "-d") == 0){
+		load_default();
+		fetchExecute();
+	}
+	print_assembly();
 	display_mem();
 	return 0;
 }
@@ -48,62 +53,90 @@ struct Word* getMainMemory(int location) {
 	return &main_memory[location];
 }
 
-void opCodeFunctions (struct Instruction exInstruct, struct CPU comp, int x) {
-	for (comp.pc = 0; comp.pc < 1000; comp.pc++) {
+int opCodeFunctions (struct Instruction exInstruct) {
+	switch(exInstruct.opcode) {
+		case 0: return -1;
+			
+		case 1:
+			cpu.mbr = cpu.mar;
+			cpu.ac = getMainMemory(cpu.mbr)->contents;
+		break;
 		
-		comp.ir = main_memory[comp.pc].contents;
-		comp.mar = x; 
-		comp.mbr = main_memory[comp.mar].contents;
+		case 2: 
+			cpu.mbr = cpu.mar;
+			getMainMemory(cpu.mbr)->contents = cpu.ac;
+		break;
 		
-		switch(exInstruct.opcode) {
-			case 0: break;
-			
-			case 1: comp.ac = comp.mbr;
-			break;
-			
-			case 2: main_memory[comp.mbr].contents = comp.ac;
-			break;
-			
-			case 3: comp.ac -= comp.mbr;
-			break;
-			
-			case 4: comp.ac += comp.mbr;
-			break;
-			
-			case 5: 
-				printf("Please enter the value you would like to input into the Accumulator \n");
-				scanf("%d", &comp.ac);
-				comp.input_register = comp.ac;
-			break;
-			
-			case 6:
-				comp.output_register = comp.ac;
-				printf("The value currently stored in the Accumulator is %d", comp.ac);
-			break;
-			
-			case 7: 
-				if (comp.mbr != 1024) {
-					comp.pc+=1;
-				}
-			break;
-			
-			case -8: comp.pc = comp.mbr;
-			break;
-			
-			case -7: comp.ac = comp.ac * comp.mbr;
-			break;
-			
-			case -6: comp.mbr = comp.mbr << 2;
-			break;
-			
-			case -5: comp.mbr = comp.mbr >> 2;
-			break;
-			
-			default:
-				printf("This instruction does not exist: Opcode: %d, Operand: %d",exInstruct.opcode, exInstruct.operand);
-				break;
-			
-			
+		case 3: 
+			cpu.mbr = cpu.mar;
+			cpu.ac -= getMainMemory(cpu.mbr)->contents;
+		break;
+		
+		case 4: 
+			cpu.mbr = cpu.mar;
+			cpu.ac += getMainMemory(cpu.mbr)->contents;
+		break;
+		
+		case 5: 
+			printf("Please enter the value you would like to input into the Accumulator \n");
+			int temp;
+			scanf("%d", &temp);
+			cpu.ac = temp;
+			cpu.input_register = cpu.ac;
+		break;
+		
+		case 6:
+			cpu.output_register = cpu.ac;
+			printf("The value currently stored in the Accumulator is %d", cpu.ac);
+		break;
+		
+		case 7: 
+			if (cpu.mbr != 1024) {
+				cpu.pc+=1;
+			}
+		break;
+		
+		case -8: 
+			cpu.mbr = cpu.mar;
+			cpu.pc = cpu.mbr;
+		break;
+		
+		case -7: 
+			cpu.mbr = cpu.mar;
+			cpu.ac = cpu.ac * cpu.mbr;
+		break;
+		
+		case -6: 
+			cpu.mbr = cpu.mar;
+			cpu.mbr = cpu.mbr << 2;
+		break;
+		
+		case -5: 
+			cpu.mbr = cpu.mar;
+			cpu.mbr = cpu.mbr >> 2;
+		break;
+		
+		default:
+			printf("This instruction does not exist: Opcode: %d, Operand: %d",exInstruct.opcode, exInstruct.operand);
+			return -1;
+		
+		
+	}
+	return 0;
+}
+
+int fetchExecute(){
+	cpu.pc = 0;
+	int stop = 1;
+	while(stop){
+		cpu.mar = cpu.pc;
+		cpu.ir = getMainMemory(cpu.mar)->contents;
+		cpu.pc++;
+		struct Instruction instruction = decodeInstruction(cpu.ir);
+		cpu.mar = instruction.operand;
+		if ((opCodeFunctions(instruction) == -1) || (cpu.pc > 2046)){
+			stop = 0;
 		}
 	}
+	return 0;
 }
