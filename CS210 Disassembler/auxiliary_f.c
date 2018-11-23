@@ -189,8 +189,9 @@ void print_instruction(Instruction instruct){
 }
 
 Instruction decodeInstruction(int num){
-	//printf("%d", num);
-	Instruction instruct;
+    Instruction instruct;
+	
+	
 	char opCode_s[5]="";
 	char operand_s[13]="";
 	for (int i=15;i>=12;i--){
@@ -208,6 +209,8 @@ Instruction decodeInstruction(int num){
 				strcat(operand_s, "0");
 			}
 		}
+		
+
 		instruct.operand = twoCtoD(operand_s);
 		return instruct;
 }

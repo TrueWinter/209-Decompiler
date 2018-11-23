@@ -63,7 +63,6 @@ Word* getMainMemory(int location) {
 }
 
 int opCodeFunctions (Instruction exInstruct) {
-	printf("Opcode: %d\n", exInstruct.opcode);
 
 	switch(exInstruct.opcode) {
 		case 0: return -1;
