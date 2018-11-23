@@ -3,10 +3,10 @@
 #include <math.h>
 #include <string.h>
 
-struct Word* getMainMemory();
+Word* getMainMemory();
 int getNthBit(int input, int desired_bit);
 
-void clear_mem(struct Word *);
+void clear_mem(Word *);
 int btod(char *);
 int twoCtoD(char *);
 void dtob(int num, char *str);
@@ -15,8 +15,8 @@ void display_mem();
 int load_file(char *);
 void user_code();
 void print_assembly();
-void print_instruction(struct Instruction);
-struct Instruction decodeInstruction(int);
+void print_instruction(Instruction);
+Instruction decodeInstruction(int);
 
 
 void getBin(int num, char *str);
@@ -28,12 +28,12 @@ const int word_size = 16;
  * Clears the memory by filling it with 0s
  */
 
-void clear_mem(struct Word *main_memory){
+void clear_mem(Word *main_memory){
 	memset (main_memory, 0, mem_size);
 }
 
 void load_default(){
-	char filename[20] = "default.txt";
+	char filename[20] = "asm/halt_test.txt";
 	load_file(filename);
 }
 /* 
@@ -93,11 +93,13 @@ void display_mem(){
 	char bin[16];
 	dtob(16, bin);
 
+	printf("\nMEMORY: \n");
 	for (i=0;i<=mem_size;i++){
 
 		char bufferWord[16];
 		dtob(getMainMemory(i)->contents, bufferWord);
 
+		
 		if ((getMainMemory(i)->contents) != 0){ //just prints the addresses with data or instructions other than halt in them
 			printf("Word: %d    \tValue:  %s\n", i, bufferWord); 
 		}
@@ -134,11 +136,8 @@ int load_file(char *file_name){
 	char bin[17];
 	int i = 0;
 	while (fgets(temp, 18, fp)!=NULL){
-		//puts(temp);
 		strncpy(bin, temp, 16);
 		bin[16] = '\0';
-		//puts(bin);
-		//printf("%d\n", twoCtoD(bin));
 		getMainMemory(i)->contents = twoCtoD(bin);
 		i++;
 	}
@@ -148,10 +147,12 @@ int load_file(char *file_name){
 }
 
 void print_assembly(){
-	struct Instruction instruct;
+	Instruction instruct;
 	instruct.opcode = -1;
 	int i;
 	int counter = 0;
+
+	printf("\nASSEMBLY: \n");
 	while (instruct.opcode != 0){
 		instruct = decodeInstruction(getMainMemory(counter)->contents);
 		print_instruction(instruct);
@@ -159,7 +160,7 @@ void print_assembly(){
 	}
 }
 
-void print_instruction(struct Instruction instruct){
+void print_instruction(Instruction instruct){
 	if (instruct.opcode == 0){
 		printf("Halt\n");
 	} else if (instruct.opcode == 1){
@@ -187,9 +188,9 @@ void print_instruction(struct Instruction instruct){
 	}
 }
 
-struct Instruction decodeInstruction(int num){
+Instruction decodeInstruction(int num){
 	//printf("%d", num);
-	struct Instruction instruct;
+	Instruction instruct;
 	char opCode_s[5]="";
 	char operand_s[13]="";
 	for (int i=15;i>=12;i--){

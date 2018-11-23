@@ -13,8 +13,8 @@
 */
 
 //Declare main CPU. Check 'structs.c' for details.
-struct CPU cpu;
-struct Word main_memory[4096]; 
+CPU cpu;
+Word main_memory[4096]; 
 
 
 
@@ -24,16 +24,25 @@ struct Word main_memory[4096];
 
 // Returns n'th bit from the input given to it
 int getNthBit(int input, int desired_bit); 
-struct Word* getMainMemory(); //Access as a pointer so we can use it as a massive long 'word' 
-int opCodeFunctions(struct Instruction exInstruct); // x will be the decimal version of the instruction, passed in to be added to MAR
+Word* getMainMemory(); //Access as a pointer so we can use it as a massive long 'word' 
+int opCodeFunctions(Instruction exInstruct); // x will be the decimal version of the instruction, passed in to be added to MAR
 int fetchExecute();
 
 int main(int argc, char *argv[]) {
 	clear_mem(getMainMemory(0));
-	if (strcmp(argv[argc-1], "-d") == 0){
+
+	
+	if (strcmp(argv[1], "-d") == 0){
 		load_default();
 		fetchExecute();
 	}
+
+	if (strcmp(argv[1], "-f") == 0){
+		load_file(argv[2]);
+		fetchExecute();
+	}
+
+
 	print_assembly();
 	display_mem();
 	return 0;
@@ -49,11 +58,13 @@ int getNthBit(int input, int desired_bit) {
 	return (input >> desired_bit) & 1;
 }
 
-struct Word* getMainMemory(int location) {
+Word* getMainMemory(int location) {
 	return &main_memory[location];
 }
 
-int opCodeFunctions (struct Instruction exInstruct) {
+int opCodeFunctions (Instruction exInstruct) {
+	printf("Opcode: %d\n", exInstruct.opcode);
+
 	switch(exInstruct.opcode) {
 		case 0: return -1;
 			
@@ -95,6 +106,7 @@ int opCodeFunctions (struct Instruction exInstruct) {
 				cpu.pc+=1;
 			}
 		break;
+
 		
 		case -8: 
 			cpu.mbr = cpu.mar;
@@ -127,15 +139,15 @@ int opCodeFunctions (struct Instruction exInstruct) {
 
 int fetchExecute(){
 	cpu.pc = 0;
-	int stop = 1;
-	while(stop){
+	int running = 1;
+	while(running){
 		cpu.mar = cpu.pc;
 		cpu.ir = getMainMemory(cpu.mar)->contents;
 		cpu.pc++;
-		struct Instruction instruction = decodeInstruction(cpu.ir);
+		Instruction instruction = decodeInstruction(cpu.ir);
 		cpu.mar = instruction.operand;
-		if ((opCodeFunctions(instruction) == -1) || (cpu.pc > 2046)){
-			stop = 0;
+		if (opCodeFunctions(instruction) == -1 || cpu.pc > 2046){
+			running = 0;
 		}
 	}
 	return 0;

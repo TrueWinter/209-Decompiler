@@ -4,12 +4,12 @@
 * Word - 12 bits per address
 */
 
-struct Instruction {
+typedef struct {
 	int operand : 12;
 	int opcode : 4;
-};
+}Instruction;
 
-struct CPU {
+typedef struct{
 	int ac: 16;
 	int ir: 16;
 	int mbr: 16;
@@ -18,8 +18,8 @@ struct CPU {
 
 	int output_register;
 	int input_register;
-};
+}CPU;
 
-struct Word {
+typedef struct {
 	int contents : 16;
-};
+}Word;
