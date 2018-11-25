@@ -42,9 +42,36 @@ int main(int argc, char *argv[]) {
 		fetchExecute();
 	}
 
+	if (strcmp(argv[1], "-c") == 0){
+	
+		for(int i = 0; i < 4096; i++){
+			char temp[16];
+			printf("Enter word %d to be placed into memory: \n", i);
+			scanf("%s", &temp);
+
+			if (strcmp(temp, "stop") == 0)
+     		{
+				 printf("Exiting");
+				 break;
+      		}
+
+			Word word;
+			word.contents = btod(temp);
+			main_memory[i] = word;
+		}
+		fetchExecute();
+	}
+
 
 	print_assembly();
 	display_mem();
+
+
+	char bin[16];
+	dtob(cpu.ac, bin);
+
+	printf("AC: %s\n", bin);
+
 	return 0;
 }
 
@@ -97,7 +124,7 @@ int opCodeFunctions (Instruction exInstruct) {
 		
 		case 6:
 			cpu.output_register = cpu.ac;
-			printf("The value currently stored in the Accumulator is %d", cpu.ac);
+			printf("The value currently stored in the Accumulator is %d\n", cpu.ac);
 		break;
 		
 		case 7: 
@@ -105,13 +132,13 @@ int opCodeFunctions (Instruction exInstruct) {
 				cpu.pc+=1;
 			}
 		break;
-
 		
 		case -8: 
 			cpu.mbr = cpu.mar;
 			cpu.pc = cpu.mbr;
 		break;
-		
+
+		/*		
 		case -7: 
 			cpu.mbr = cpu.mar;
 			cpu.ac = cpu.ac * cpu.mbr;
@@ -126,7 +153,7 @@ int opCodeFunctions (Instruction exInstruct) {
 			cpu.mbr = cpu.mar;
 			cpu.mbr = cpu.mbr >> 2;
 		break;
-		
+		*/
 		default:
 			printf("This instruction does not exist: Opcode: %d, Operand: %d",exInstruct.opcode, exInstruct.operand);
 			return -1;
