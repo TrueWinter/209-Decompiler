@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
 
 			if (strcmp(temp, "stop") == 0)
      		{
-				 printf("Exiting");
+				 printf("\nExiting...\n");
 				 break;
       		}
 
