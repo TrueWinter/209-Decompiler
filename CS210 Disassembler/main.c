@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
 		for(int i = 0; i < 4096; i++){
 			char temp[16];
 			printf("Enter word %d to be placed into memory: \n", i);
-			scanf("%s", &temp);
+			scanf("%s", &temp[0]);
 
 			if (strcmp(temp, "stop") == 0)
      		{
@@ -133,27 +133,27 @@ int opCodeFunctions (Instruction exInstruct) {
 			}
 		break;
 		
-		case -8: 
+		case 8: 
 			cpu.mbr = cpu.mar;
 			cpu.pc = cpu.mbr;
 		break;
 
-		/*		
-		case -7: 
+				
+		case 9: 
 			cpu.mbr = cpu.mar;
 			cpu.ac = cpu.ac * cpu.mbr;
 		break;
 		
-		case -6: 
+		case 10: 
 			cpu.mbr = cpu.mar;
 			cpu.mbr = cpu.mbr << 2;
 		break;
 		
-		case -5: 
+		case 11: 
 			cpu.mbr = cpu.mar;
 			cpu.mbr = cpu.mbr >> 2;
 		break;
-		*/
+		
 		default:
 			printf("This instruction does not exist: Opcode: %d, Operand: %d",exInstruct.opcode, exInstruct.operand);
 			return -1;
@@ -172,7 +172,7 @@ int fetchExecute(){
 		cpu.pc++;
 		Instruction instruction = decodeInstruction(cpu.ir);
 		cpu.mar = instruction.operand;
-		if (opCodeFunctions(instruction) == -1 || cpu.pc > 2046){
+		if (opCodeFunctions(instruction) == -1){
 			running = 0;
 		}
 	}

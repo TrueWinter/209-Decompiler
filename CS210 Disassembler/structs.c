@@ -5,15 +5,15 @@
 */
 
 typedef struct {
-	int operand : 12;
-	int opcode : 4;
+	unsigned int operand : 12;
+	unsigned int opcode : 4;
 }Instruction;
 
 typedef struct{
 	int ac: 16;
 	int ir: 16;
 	int mbr: 16;
-	int pc : 12;
+	unsigned int pc : 12;
 	int mar : 12;
 
 	int output_register;

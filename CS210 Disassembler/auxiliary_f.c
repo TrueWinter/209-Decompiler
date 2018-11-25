@@ -179,13 +179,14 @@ void print_instruction(Instruction instruct){
 		printf("Skipcond\n");
 	} else if (instruct.opcode == 8){
 		printf("Jump %d\n", instruct.operand);
-	//} else if (instruct.opcode == -7){
-	//	printf("Multiply %d\n", instruct.operand);
-	//} else if (instruct.opcode == -6) {
-	//	printf("Shift Left %d\n", instruct.operand);
-	//} else if (instruct.operand == -5) {
-	//	printf("Shift Right %d\n", instruct.operand);
+	} else if (instruct.opcode == 9){
+		printf("Multiply %d\n", instruct.operand);
+	} else if (instruct.opcode == 10) {
+		printf("Shift Left %d\n", instruct.operand);
+	} else if (instruct.opcode == 11) {
+		printf("Shift Right %d\n", instruct.operand);
 	}
+	else printf("%d is not a valid opcode\n", instruct.opcode);
 }
 
 Instruction decodeInstruction(int num){
@@ -209,6 +210,6 @@ Instruction decodeInstruction(int num){
 			}
 		}
 		
-		instruct.operand = twoCtoD(operand_s);
+		instruct.operand = btod(operand_s);
 		return instruct;
 }
