@@ -1,3 +1,32 @@
+/**************************************************************************
+ * Assessment Title: ACE3 Computer
+ *
+ *
+ * Number of Submitted C Files: 3
+ *
+ * 
+ * Date: 25/11/18
+ *
+ * 
+ * Authors: 
+ *	1. FRASER BELL, Reg no: 201718540
+ *	2. IAN HENDERSON, Reg no: 201707694
+ *	3. ROSS WILLIAMSON, Reg no: 201707864
+ *	4. MONIKA KORNAZEWSKA, Reg no: 201707759
+ * 	5. LAUREN CRONIN, Reg no: 201707491
+ * 
+ *
+ *	Statement: We confirm that this submission is all our own work.
+ *
+ *      (Signed)FRASER BELL
+ *	
+ * 	(Signed)IAN HENDERSON
+ *	
+ *	(Signed)MONIKA KORNAZEWSKA
+ *	
+ *	(Signed)LAUREN CRONIN
+ *
+ **************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -32,9 +61,15 @@ void clear_mem(Word *main_memory){
 	memset (main_memory, 0, mem_size);
 }
 
+/*
+ * Hardcodes a default program to add two user inputs together and display them
+ */
 void load_default(){
-	char filename[20] = "asm/halt_test.txt";
-	load_file(filename);
+	getMainMemory(0)->contents = 0b0101000000000000;
+	getMainMemory(1)->contents = 0b0010000000001011;
+	getMainMemory(2)->contents = 0b0101000000000000;
+	getMainMemory(3)->contents = 0b0100000000001011;
+	getMainMemory(4)->contents = 0b0110000000000000;
 }
 /* 
 * Converts a binary string into a decimal value
@@ -87,6 +122,9 @@ void dtob(int num, char *str)
     *str++ = !!(mask & num) + '0';
 }
 
+/*
+ * Displays the contents of main memory
+ */
 void display_mem(){
 	int i;
 
@@ -107,6 +145,9 @@ void display_mem(){
 	}
 }
 
+/*
+ * Prompts the user to enter binary words and stores these in main memory
+ */
 void user_code(){
 	char input[16];
 	char exit_string[] = "stop";
@@ -114,17 +155,20 @@ void user_code(){
 	while (strcmp(exit_string, input)!=0){
 		printf("Please enter the next 16 bit instruction in binary\nEnter 'stop' to stop input: ");
 		scanf("%s", input);
-		while(((twoCtoD(input) == 32768) || (strlen(input) > 16)) && (strcmp(exit_string, input)!=0)){
+		while(((twoCtoD(input) == 32768) || (strlen(input) > 16))){
 			printf("Enter it again: ");
 			scanf("%s", input);
 		}
 		if (strcmp(exit_string, input)!=0){
-			getMainMemory(i)->contents = twoCtoD(input);
+			getMainMemory(i)->contents = btod(input);
 		}
 		i++;
 	}
 }
 
+/*
+ * Stores the contents of a file in main memory
+ */
 int load_file(char *file_name){
 	FILE *fp;
 	fp = fopen(file_name, "r");
@@ -146,10 +190,12 @@ int load_file(char *file_name){
 	return 0;
 }
 
+/*
+ * Prints the contents of memory as the corresponding assembly code
+ */
 void print_assembly(){
 	Instruction instruct;
 	instruct.opcode = -1;
-	int i;
 	int counter = 0;
 
 	printf("\nASSEMBLY: \n");
@@ -160,6 +206,9 @@ void print_assembly(){
 	}
 }
 
+/*
+ * Prints a single instruction in assembly
+ */
 void print_instruction(Instruction instruct){
 	if (instruct.opcode == 0){
 		printf("Halt\n");
@@ -183,14 +232,17 @@ void print_instruction(Instruction instruct){
 		printf("Multiply %d\n", instruct.operand);
 	} else if (instruct.opcode == 10) {
 		printf("Shift Left %d\n", instruct.operand);
-	} else if (instruct.operand == 11) {
+	} else if (instruct.opcode == 11) {
 		printf("Shift Right %d\n", instruct.operand);
 	}
+	else printf("%d is not a valid opcode\n", instruct.opcode);
 }
 
+/*
+ * Takes in a word and extracts the opcode and operand from the instuction and stores them in a struct
+ */
 Instruction decodeInstruction(int num){
     Instruction instruct;
-	
 	
 	char opCode_s[5]="";
 	char operand_s[13]="";
@@ -201,7 +253,7 @@ Instruction decodeInstruction(int num){
 				strcat(opCode_s, "0");
 			}
 		}
-		instruct.opcode = twoCtoD(opCode_s);
+		instruct.opcode = btod(opCode_s);
 		for (int i=11;i>=0;i--){
 			if (getNthBit(num, i) == 1){
 				strcat(operand_s, "1");
@@ -210,7 +262,6 @@ Instruction decodeInstruction(int num){
 			}
 		}
 		
-
-		instruct.operand = twoCtoD(operand_s);
+		instruct.operand = btod(operand_s);
 		return instruct;
 }
